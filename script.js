@@ -2489,6 +2489,10 @@ function render() {
   updateNavBadge();
 }
 
+document.querySelectorAll(".footer-year").forEach((year) => {
+  year.textContent = new Date().getFullYear();
+});
+
 document.getElementById("chatLaunch").onclick = () => {
   document.getElementById("chatBox").style.display = "block";
 };

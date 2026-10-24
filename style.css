@@ -1698,13 +1698,8 @@ body[data-page="home"] #app > .hero {
   padding: clamp(42px, 7vw, 92px) clamp(24px, 9vw, 140px);
   border-radius: 0;
   background:
-    linear-gradient(
-      90deg,
-      rgba(12, 27, 19, 0.86) 0%,
-      rgba(12, 27, 19, 0.66) 43%,
-      rgba(12, 27, 19, 0.16) 100%
-    ),
-    url("images/crayfish-farm.jpg") center / cover no-repeat;
+    radial-gradient(circle at 82% 20%, rgba(123, 174, 133, 0.32), transparent 30%),
+    linear-gradient(115deg, #123b2b 0%, #245d40 52%, #347453 100%);
   box-shadow: none;
   overflow: hidden;
 }
@@ -1870,12 +1865,94 @@ body[data-page="home"] #app > .panel {
   font-size: 12px;
 }
 
+/* Shared visual refinements */
+body {
+  min-height: 100vh;
+  line-height: 1.45;
+}
+.topbar {
+  padding-left: clamp(16px, 5vw, 72px);
+  padding-right: clamp(16px, 5vw, 72px);
+  box-shadow: 0 2px 12px rgba(24, 59, 40, 0.04);
+}
+.nav a {
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.nav a:hover {
+  background: #f1f5f0;
+  color: var(--green);
+}
+.card,
+.panel,
+.package,
+.pkg-card,
+.stat {
+  box-shadow: 0 8px 24px rgba(23, 63, 46, 0.06);
+}
+.card,
+.panel,
+.package,
+.pkg-card,
+.stat,
+.sidebar,
+.calendar {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+button:active {
+  transform: translateY(0);
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+.footer > strong {
+  color: var(--green);
+  letter-spacing: 0.03em;
+}
+.footer > span {
+  max-width: 520px;
+  color: #526155;
+}
+.footer > small {
+  color: var(--muted);
+}
+.chat-launch {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.chat-launch:hover {
+  background: var(--green2);
+  box-shadow: 0 10px 28px rgba(18, 58, 40, 0.32);
+}
+@media (max-width: 800px) {
+  .topbar {
+    position: sticky;
+  }
+}
+@media (max-width: 540px) {
+  .hero .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .hero .hero-actions button {
+    width: 100%;
+  }
+  .modal-body,
+  .modal-head,
+  .modal-foot {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
 @media (max-width: 800px) {
   body[data-page="home"] #app > .hero {
-    width: calc(100vw - 6px);
+    width: 100%;
     min-height: 540px;
     padding: 54px 7%;
     background-position: 60% center;
+    left: auto;
+    transform: none;
   }
   body[data-page="home"] #app > .hero h1 {
     font-size: clamp(36px, 7vw, 48px);
