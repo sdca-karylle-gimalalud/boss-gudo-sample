@@ -718,13 +718,7 @@ function syncPageChrome(nextPage) {
 }
 function ensureNavigationShell() {
   let shell = document.querySelector("body > header.topbar");
-  shell?.classList.add("inner-navbar");
-  if (!shell) {
-    shell = document.createElement("header");
-    shell.className = "topbar inner-navbar";
-    shell.innerHTML = `<a href="index.html" class="brand"><img src="pictures/boss-gudo-logo.png" alt="BOSSGUDO A.R.C. AQUA FARM logo" class="brand-logo" /><span class="brand-name">BOSSGUDO<small>A.R.C. AQUA FARM</small></span></a><nav class="nav" id="mainNav" aria-label="Main navigation"><a href="index.html" data-page="home">Home</a><a href="about.html" data-page="about">About</a><a href="packages.html" data-page="packages">Packages</a><a href="booking.html" data-page="booking">Bookings</a><a href="mybookings.html" data-page="mybookings">My Bookings</a><a href="login.html" data-page="login">Log In</a></nav>`;
-    document.body.insertBefore(shell, document.body.firstChild);
-  }
+  if (!shell) return;
   shell.hidden = page === "home";
 }
 function setPage(p) {
@@ -1080,44 +1074,6 @@ function adminCalendar() {
     closed = [...blockedDates[k]].sort();
   return `<div class="panel"><div class="admin-header"><div><h3>Calendar Controls</h3><p class="muted">Open or close weekend dates. Customers can select only open dates.</p></div><div class="pill-row"><button class="${k === "service" ? "primary" : "secondary"} small" onclick="setCalKind('service')">Package service calendar</button><button class="${k === "visit" ? "primary" : "secondary"} small" onclick="setCalKind('visit')">Visitation calendar</button></div></div><div class="calendar-wrap" style="margin-top:18px">${calendarBlock(k, "admin")}<div><div class="card"><h3>Closed dates</h3>${closed.length ? closed.map((d) => `<div class="summary-line"><span>${fmtDate(d)}</span><button class="secondary small" onclick="toggleBlock('${k}','${d}')">Reopen</button></div>`).join("") : '<p class="muted">No closed dates.</p>'}</div></div></div><div class="notice" style="margin-top:16px">Click a weekend date to close or reopen it. Past dates cannot be changed. Closing a date does not cancel existing bookings.</div></div>`;
 }
-function home() {
-  const act = activePackages();
-  return `
-<section class="hero">
-  <header class="topbar home-navbar">
-    <a href="index.html" class="brand">
-      <img src="pictures/boss-gudo-logo.png" alt="BOSSGUDO A.R.C. AQUA FARM logo" class="brand-logo" />
-      <span class="brand-name">BOSSGUDO<small>A.R.C. AQUA FARM</small></span>
-    </a>
-    <nav class="nav" id="heroNav" aria-label="Main navigation">
-      <a href="index.html" data-page="home" class="active">Home</a>
-      <a href="about.html" data-page="about">About</a>
-      <a href="packages.html" data-page="packages">Packages</a>
-      <a href="booking.html" data-page="booking">Bookings</a>
-      <a href="mybookings.html" data-page="mybookings">My Bookings</a>
-      <a href="login.html" data-page="login">Log In</a>
-    </nav>
-  </header>
-  <div class="hero-content">
-    <div class="eyebrow">Australian Red Claw · Crayfish Services</div>
-    <h1>Good ponds make good beginnings.</h1>
-    <p>Welcome to BossGudo ARC. Find a pond package, plan a custom setup, or arrange a farm visit with a clear, friendly booking process.</p>
-    <div class="hero-actions">
-      <button class="primary" onclick="startBooking()">Book a Service</button>
-      <button class="secondary" onclick="setPage('packages')">Explore Packages</button>
-    </div>
-  </div>
-</section>
-<div class="section-head"><div><h2>Services built around your needs</h2><p>Choose a pond package, design your own pond, or visit the farm.</p></div><button class="secondary" onclick="setPage('about')">About the Farm →</button></div>
-<section class="grid3">
-<div class="card"><img class="service-photo" src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=85" alt="Clear water in a pond installation"><h3>Pond Packages</h3><p>Predefined pond installation packages, each with an included freebie.</p><span class="price-note">${act.length ? "From " + money(Math.min(...act.map((x) => x.price))) : "Packages coming soon"}</span><br><button class="secondary" onclick="setPage('packages')">View packages</button></div>
-<div class="card"><img class="service-photo" src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1000&q=85" alt="Water pond landscape" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=85'"><h3>Custom Pond Design</h3><p>Set your own layers, size, and filtration. The price is calculated from your pond size.</p><span class="price-note">Price based on dimensions</span><br><button class="secondary" onclick="choosePkgById('custom')">Design my pond</button></div>
-<div class="card"><img class="service-photo" src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=85" alt="Farm landscape for a visit" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=85'"><h3>Farm Visitation</h3><p>Schedule a farm visit for 1–5 visitors on available weekends.</p><span class="price-note">Weekends only</span><br><button class="secondary" onclick="chooseBookingType('visit')">Book a visitation</button></div>
-</section>
-<div class="section-head"><div><h2>How it works</h2><p>Pick what you need first. Each option has its own short process.</p></div></div>
-<section class="steps"><div class="step-card"><div class="step-num">STEP 01</div><h3>Choose what to book</h3><p>Start by selecting Book a Service or Book a Visitation.</p></div><div class="step-card"><div class="step-num">STEP 02</div><h3>Pick, schedule, pay</h3><p>Services: choose a package, pick your date, enter your details, then pay the 50% down payment. Visits: pick an open weekend and add your visitor details.</p></div><div class="step-card"><div class="step-num">STEP 03</div><h3>Track every update</h3><p>Your booking is confirmed once the owner verifies your down payment. After the service, any delivery fee is added and you pay the remaining balance in My Bookings.</p></div></section>`;
-}
-
 function pkgCardPublic(x) {
   return `<article class="pkg-card"><div class="pkg-media">${pkgImg(x)}${x.featured ? '<span class="pkg-badge">★ MOST POPULAR</span>' : ""}</div><div class="pkg-body"><h3>${safe(x.name)}</h3><p>${safe(x.description)}</p><div class="chips"><span class="chip">${safe(x.layers)}</span><span class="chip">${safe(x.dimensions)}</span></div><div class="freebie"><span>🎁</span><span><strong>Free with this package</strong><br>${safe(x.freebie)}</span></div><div class="pkg-foot"><div class="price-big"><small>Package price</small>${money(x.price)}</div><button class="primary" onclick="choosePkgById('${x.id}')">Choose</button></div></div></article>`;
 }
@@ -2500,8 +2456,17 @@ function adminSales() {
 /* ----- render ----- */
 function render() {
   ensureNavigationShell();
+  if (page === "home") {
+    const template = document.getElementById("homeTemplate");
+    if (template) app.replaceChildren(template.content.cloneNode(true));
+    const packages = activePackages();
+    const price = document.getElementById("homePackagePrice");
+    if (price)
+      price.textContent = packages.length
+        ? `From ${money(Math.min(...packages.map((item) => item.price)))}`
+        : "Packages coming soon";
+  }
   const views = {
-    home,
     about,
     packages,
     booking,
@@ -2512,7 +2477,7 @@ function render() {
     register,
     admin,
   };
-  app.innerHTML = (views[page] || home)();
+  if (page !== "home") app.innerHTML = (views[page] || about)();
   document
     .querySelectorAll(".nav a[data-page]")
     .forEach((link) =>
@@ -2580,10 +2545,21 @@ if (chatForm) {
 // Delegation keeps navigation working when the homepage renders its navbar inside the hero.
 document.addEventListener("click", (e) => {
   const link = e.target.closest(".nav a[data-page]");
-  if (!link) return;
-  e.preventDefault();
-  if (link.dataset.page === "booking") bookingType = null;
-  setPage(link.dataset.page);
+  if (link) {
+    e.preventDefault();
+    if (link.dataset.page === "booking") bookingType = null;
+    setPage(link.dataset.page);
+    return;
+  }
+
+  const actionButton = e.target.closest("[data-action]");
+  if (!actionButton) return;
+  const action = actionButton.dataset.action;
+  if (action === "start-booking") startBooking();
+  if (action === "show-packages") setPage("packages");
+  if (action === "show-about") setPage("about");
+  if (action === "custom-pond") choosePkgById("custom");
+  if (action === "show-visit") chooseBookingType("visit");
 });
 window.addEventListener("popstate", () => {
   const currentFile = location.pathname.split("/").pop() || "index.html",
