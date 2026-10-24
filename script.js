@@ -11,7 +11,7 @@ let page = document.body.dataset.page || "home",
   calMonth = 10,
   calYear = 2026,
   loggedIn = false,
-  userName = "Demo Customer",
+  userName = "Customer Account",
   adminTab = "overview";
 let bFilter = "all",
   bSearch = "",
@@ -110,7 +110,7 @@ function sel(id, label, opts, val, attrs = "") {
 let customers = [
   {
     id: "C-001",
-    name: "Demo Customer",
+    name: "Customer Account",
     email: "customer@example.com",
     phone: "09XX XXX XXXX",
     address: "General Trias, Cavite",
@@ -162,7 +162,7 @@ function upsertCustomer(d) {
 let bookings = [
   {
     ref: "BG-2026-001",
-    name: "Demo Customer",
+    name: "Customer Account",
     pkg: "Pond Grower Package",
     freebie: "Free 500 g starter crayfish feed",
     packageLayers: "2 layers",
@@ -257,7 +257,7 @@ let bookings = [
   },
   {
     ref: "BG-2026-003",
-    name: "Demo Customer",
+    name: "Customer Account",
     pkg: "Pond Starter Package",
     freebie: "Free starter water-test kit",
     packageLayers: "1 layer",
@@ -314,7 +314,7 @@ let currentRef = "BG-2026-001",
 let visits = [
   {
     ref: "VS-2026-001",
-    name: "Demo Customer",
+    name: "Customer Account",
     email: "customer@example.com",
     phone: "09XX XXX XXXX",
     farm: "Reyes Aqua Farm",
@@ -647,7 +647,7 @@ function timelineHtml(b, showNew) {
 }
 function myBookingList() {
   return bookings.filter(
-    (b) => b.name === userName || userName === "Demo Customer",
+    (b) => b.name === userName || userName === "Customer Account",
   );
 }
 function myUnread() {
@@ -658,10 +658,11 @@ function myUnread() {
 }
 function updateNavBadge() {
   const n = myUnread(),
-    btn = document.querySelector('#mainNav a[data-page="mybookings"]');
-  if (btn)
+    buttons = document.querySelectorAll('.nav a[data-page="mybookings"]');
+  buttons.forEach((btn) => {
     btn.innerHTML =
       "My Bookings" + (n ? `<span class="badge">${n}</span>` : "");
+  });
 }
 
 function fmtDate(iso, long = false) {
@@ -699,13 +700,41 @@ const pageFiles = {
   login: "login.html",
   admin: "admin.html",
 };
+const pageTitles = {
+  home: "Home",
+  about: "About",
+  packages: "Packages",
+  booking: "Bookings",
+  mybookings: "My Bookings",
+  login: "Log In",
+  admin: "Admin Dashboard",
+  register: "Create an Account",
+  success: "Booking Submitted",
+  customerpayment: "Payment",
+};
+function syncPageChrome(nextPage) {
+  document.body.dataset.page = nextPage;
+  document.title = `${pageTitles[nextPage] || "Home"} | BOSSGUDO A.R.C. AQUA FARM`;
+}
+function ensureNavigationShell() {
+  let shell = document.querySelector("body > header.topbar");
+  shell?.classList.add("inner-navbar");
+  if (!shell) {
+    shell = document.createElement("header");
+    shell.className = "topbar inner-navbar";
+    shell.innerHTML = `<a href="index.html" class="brand"><img src="pictures/boss-gudo-logo.png" alt="BOSSGUDO A.R.C. AQUA FARM logo" class="brand-logo" /><span class="brand-name">BOSSGUDO<small>A.R.C. AQUA FARM</small></span></a><nav class="nav" id="mainNav" aria-label="Main navigation"><a href="index.html" data-page="home">Home</a><a href="about.html" data-page="about">About</a><a href="packages.html" data-page="packages">Packages</a><a href="booking.html" data-page="booking">Bookings</a><a href="mybookings.html" data-page="mybookings">My Bookings</a><a href="login.html" data-page="login">Log In</a></nav>`;
+    document.body.insertBefore(shell, document.body.firstChild);
+  }
+  shell.hidden = page === "home";
+}
 function setPage(p) {
   const file = pageFiles[p];
   if (file && location.pathname.split("/").pop() !== file)
     history.pushState({ page: p }, "", file);
   page = p;
+  syncPageChrome(p);
   document
-    .querySelectorAll("#mainNav a")
+    .querySelectorAll(".nav a[data-page]")
     .forEach((link) =>
       link.classList.toggle("active", link.dataset.page === p),
     );
@@ -745,8 +774,8 @@ function calendarHtml(kind = "service", mode = "select") {
     } else {
       if (open && !isBlocked) {
         click = `onclick="pickDate('${kind}','${val}')"`;
-        title = "Available (demo)";
-      } else if (open) title = "Unavailable (demo)";
+        title = "Available";
+      } else if (open) title = "Unavailable";
       if (sel === val) cls += " selected";
     }
     html += `<div class="${cls}" ${click ? `${click} role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"` : ""} title="${title}">${d}</div>`;
@@ -788,10 +817,10 @@ function calendarBlock(kind, mode = "select") {
   return `<div class="calendar"><div class="cal-head"><button onclick="changeMonth(-1)" aria-label="Previous month">←</button><strong>${new Date(calYear, calMonth, 1).toLocaleString("en-US", { month: "long", year: "numeric" })}</strong><button onclick="changeMonth(1)" aria-label="Next month">→</button></div><div class="cal-grid">${DAYNAMES.map((x) => `<div class="cal-dayname">${x}</div>`).join("")}${calendarHtml(kind, mode)}</div><div class="legend">${mode === "admin" ? '<span><i class="dot" style="background:#8cc596"></i>Open</span><span><i class="dot" style="background:#df9696"></i>Closed</span><span><i class="dot" style="background:#d8ddd5"></i>Not adjustable</span>' : '<span><i class="dot" style="background:#8cc596"></i>Available</span><span><i class="dot" style="background:#df9696"></i>Unavailable</span><span><i class="dot" style="background:#d8ddd5"></i>Not selectable</span>'}</div></div>`;
 }
 function login() {
-  return `<div class="panel auth-card"><div style="text-align:center"><div class="logo" style="margin:0 auto 15px">🦞</div><h1 class="page-title" style="font-size:27px">Welcome back</h1><p class="muted">Sign in to track your booking requests.</p></div><form id="loginForm"><div class="field"><label>Email address</label><input type="email" id="loginEmail" required placeholder="you@example.com" value="customer@example.com"></div><div class="field"><label>Password</label><input type="password" id="loginPassword" required placeholder="Enter password" value="demo1234"></div><button class="primary">Log In (Demo)</button></form><p class="muted" style="text-align:center;font-size:12px;margin-top:18px">Prototype only — no real account is created.</p><div class="notice">For demonstration, enter any email and password. This is not connected to a real authentication system.</div><button class="secondary" style="width:100%;margin-top:12px" onclick="setPage('register')">Create an account</button></div>`;
+  return `<div class="panel auth-card"><div style="text-align:center"><div class="logo" style="margin:0 auto 15px">🦞</div><h1 class="page-title" style="font-size:27px">Welcome back</h1><p class="muted">Sign in to track your booking requests.</p></div><form id="loginForm"><div class="field"><label>Email address</label><input type="email" id="loginEmail" required placeholder="you@example.com" value="customer@example.com"></div><div class="field"><label>Password</label><input type="password" id="loginPassword" required placeholder="Enter password"></div><button class="primary">Log In</button></form><button class="secondary" style="width:100%;margin-top:12px" onclick="setPage('register')">Create an account</button></div>`;
 }
 function register() {
-  return `<div class="panel auth-card"><div style="text-align:center"><h1 class="page-title">Create an account</h1><p class="muted">Register to submit and track bookings.</p></div><form id="registerForm"><div class="field"><label>Full name</label><input id="regName" required placeholder="Your full name"></div><div class="field"><label>Email address</label><input type="email" required placeholder="you@example.com"></div><div class="field"><label>Password</label><input type="password" required minlength="6" placeholder="At least 6 characters"></div><button class="primary">Create Demo Account</button></form><p class="muted" style="font-size:12px">This wireframe does not store real credentials.</p></div>`;
+  return `<div class="panel auth-card"><div style="text-align:center"><h1 class="page-title">Create an account</h1><p class="muted">Register to submit and track bookings.</p></div><form id="registerForm"><div class="field"><label>Full name</label><input id="regName" required placeholder="Your full name"></div><div class="field"><label>Email address</label><input type="email" required placeholder="you@example.com"></div><div class="field"><label>Password</label><input type="password" required minlength="6" placeholder="At least 6 characters"></div><button class="primary">Create Account</button></form></div>`;
 }
 function about() {
   return `<div class="breadcrumbs">Home / About</div><h1 class="page-title">About BOSSGUDO A.R.C. AQUA FARM</h1><p class="muted">Learn about the business and its services.</p><div class="panel" style="display:grid;grid-template-columns:1fr 1fr;gap:25px;align-items:center"><div><div class="eyebrow" style="color:var(--green)">About the farm</div><h2>Supporting new and growing crayfish enthusiasts</h2><p class="muted" style="line-height:1.8">BOSSGUDO A.R.C. AQUA FARM provides Australian Red Claw crayfish supply, pond setup assistance, training, and after-sales support. The farm aims to help customers understand the basics of raising crayfish and setting up suitable ponds.</p><p class="muted" style="line-height:1.8">Use the booking page to book a pond service or schedule a farm visit.</p><button class="primary" onclick="startBooking()">Book Now</button></div><div style="border-radius:18px;background:linear-gradient(145deg,#e3eee2,#a9c9ad);padding:35px;text-align:center;font-size:95px">🦞<div style="font-size:14px;font-weight:800;color:var(--green)">Australian Red Claw (ARC)</div></div></div><div class="section-head"><div><h2>What you can ask about</h2><p>Use the assistant for predefined FAQs or contact the owner for special requests.</p></div></div><div class="grid3"><div class="card"><h3>Packages & services</h3><p>Ask about supply, pond setup, and combined options.</p></div><div class="card"><h3>Training & support</h3><p>Ask the owner about training requirements and available support.</p></div><div class="card"><h3>Bookings & visits</h3><p>Book a service or schedule a farm visit on an available weekend.</p></div></div>`;
@@ -815,7 +844,7 @@ function viewPaymentProof(ref) {
   let w = window.open();
   if (!w) {
     alert(
-      "Your browser blocked the receipt preview. Allow pop-ups for this local wireframe and try again.",
+      "Your browser blocked the receipt preview. Allow pop-ups for this page and try again.",
     );
     return;
   }
@@ -879,7 +908,7 @@ function reviewStep() {
 }
 function paymentStep() {
   let p = currentPricing();
-  return `<h2>Payment</h2><p class="muted">Pay the 50% down payment in GCash, then upload your receipt. Your booking and receipt are submitted together, and your booking is confirmed once the owner verifies your payment.</p><div class="pay-grid"><div class="card" style="text-align:center"><h3>Scan to pay with GCash</h3>${qrPlaceholder()}<p class="muted" style="font-size:12px">Wireframe placeholder only. Replace this graphic with the owner's official, scannable GCash QR code.</p></div><div class="card"><h3>Owner's GCash details</h3><div class="summary-line"><span>Account name</span><strong>[Owner's GCash account name]</strong></div><div class="summary-line"><span>GCash number</span><strong>[Owner's GCash number]</strong></div><div class="summary-line"><span>Package</span><strong>${safe(selectedPackage)}</strong></div><div class="summary-line"><span>Total service price</span><strong>${money(p.total)}</strong></div><div class="summary-line"><span>50% down payment to pay now</span><strong style="font-size:23px;color:var(--green)">${money(p.deposit)}</strong></div><div class="notice" style="margin-top:15px">Open GCash, scan the QR or use the account details above, and pay the exact amount. After the transfer succeeds, upload your receipt below and submit.</div></div></div><div class="panel" style="margin-top:20px"><h3>Upload payment receipt</h3><p class="muted">Your booking is submitted together with this receipt. The owner checks the receipt against the actual GCash transaction.</p><div class="field"><label for="gcashReference">GCash transaction reference number *</label><input id="gcashReference" placeholder="Enter the transaction reference number" required></div><div class="field"><label for="gcashProof">Payment receipt / screenshot *</label><input id="gcashProof" type="file" accept="image/*,.pdf" required><p class="muted" style="font-size:12px;margin-top:6px">Accepted: image or PDF, up to 8 MB.</p></div><div class="wizard-actions"><button class="secondary" onclick="wizardStep=4;render()">← Back</button><button class="primary" onclick="submitBooking()">Submit Booking and Receipt</button></div></div>`;
+  return `<h2>Payment</h2><p class="muted">Pay the 50% down payment in GCash, then upload your receipt. Your booking and receipt are submitted together, and your booking is confirmed once the owner verifies your payment.</p><div class="pay-grid"><div class="card" style="text-align:center"><h3>Scan to pay with GCash</h3>${qrPlaceholder()}<p class="muted" style="font-size:12px">Scan the QR code or use the owner’s GCash account details.</p></div><div class="card"><h3>Owner's GCash details</h3><div class="summary-line"><span>Account name</span><strong>[Owner's GCash account name]</strong></div><div class="summary-line"><span>GCash number</span><strong>[Owner's GCash number]</strong></div><div class="summary-line"><span>Package</span><strong>${safe(selectedPackage)}</strong></div><div class="summary-line"><span>Total service price</span><strong>${money(p.total)}</strong></div><div class="summary-line"><span>50% down payment to pay now</span><strong style="font-size:23px;color:var(--green)">${money(p.deposit)}</strong></div><div class="notice" style="margin-top:15px">Open GCash, scan the QR or use the account details above, and pay the exact amount. After the transfer succeeds, upload your receipt below and submit.</div></div></div><div class="panel" style="margin-top:20px"><h3>Upload payment receipt</h3><p class="muted">Your booking is submitted together with this receipt. The owner checks the receipt against the actual GCash transaction.</p><div class="field"><label for="gcashReference">GCash transaction reference number *</label><input id="gcashReference" placeholder="Enter the transaction reference number" required></div><div class="field"><label for="gcashProof">Payment receipt / screenshot *</label><input id="gcashProof" type="file" accept="image/*,.pdf" required><p class="muted" style="font-size:12px;margin-top:6px">Accepted: image or PDF, up to 8 MB.</p></div><div class="wizard-actions"><button class="secondary" onclick="wizardStep=4;render()">← Back</button><button class="primary" onclick="submitBooking()">Submit Booking and Receipt</button></div></div>`;
 }
 function booking() {
   return bookingType === "service"
@@ -906,7 +935,7 @@ function visitBooking() {
 function visitDateStep() {
   if (visitMode === "special")
     return `<h2>Request a special date</h2><p class="muted">Use this for a date outside the regular weekend schedule, such as a weekday or a closed weekend. The admin reviews every request, and the visit is not confirmed until it is approved.</p><div class="field-grid"><div class="field"><label for="specialDate">Requested date</label><input id="specialDate" type="date" min="2026-10-22" value="${safe(visitDate)}" onchange="visitDate=this.value"></div><div class="field"><label for="specialReason">Reason for this date</label><input id="specialReason" maxlength="160" value="${safe(visitReason)}" placeholder="e.g. Only available on weekdays" oninput="visitReason=this.value"></div></div><div class="wizard-actions"><button class="secondary" onclick="setVisitMode('regular')">← Back to weekend calendar</button><button class="primary" onclick="visitToDetails()">Continue to Details →</button></div>`;
-  return `<h2>Select a visit date</h2><p class="muted">Farm visits are open on available Saturdays and Sundays. Calendar availability is sample data in this prototype.</p><div class="calendar-wrap" style="margin-top:18px">${calendarBlock("visit")}<div><div class="card"><h3>Selected date</h3><p>${visitDate ? fmtDate(visitDate, true) : "Choose an available green date"}</p><div class="notice">Each visit is for 1–5 visitors.</div></div></div></div><div class="panel"><div class="admin-header"><div><h3 style="margin:0">Need a different date?</h3><p class="muted" style="margin:6px 0 0">Dates outside the regular weekend schedule need admin review.</p></div><button class="secondary" onclick="setVisitMode('special')">Request a special date</button></div></div><div class="wizard-actions"><button class="secondary" onclick="changeBookingType()">← Back</button><button class="primary" onclick="visitToDetails()">Continue to Details →</button></div>`;
+  return `<h2>Select a visit date</h2><p class="muted">Farm visits are open on available Saturdays and Sundays. Calendar availability is managed by the farm.</p><div class="calendar-wrap" style="margin-top:18px">${calendarBlock("visit")}<div><div class="card"><h3>Selected date</h3><p>${visitDate ? fmtDate(visitDate, true) : "Choose an available green date"}</p><div class="notice">Each visit is for 1–5 visitors.</div></div></div></div><div class="panel"><div class="admin-header"><div><h3 style="margin:0">Need a different date?</h3><p class="muted" style="margin:6px 0 0">Dates outside the regular weekend schedule need admin review.</p></div><button class="secondary" onclick="setVisitMode('special')">Request a special date</button></div></div><div class="wizard-actions"><button class="secondary" onclick="changeBookingType()">← Back</button><button class="primary" onclick="visitToDetails()">Continue to Details →</button></div>`;
 }
 function setVisitMode(m) {
   visitMode = m;
@@ -1054,10 +1083,34 @@ function adminCalendar() {
 function home() {
   const act = activePackages();
   return `
-<section class="hero"><div><div class="eyebrow">Australian Red Claw · Crayfish Services</div><h1>Your crayfish journey starts here.</h1><p>Explore crayfish pond packages, custom pond design, and farm visits from BOSSGUDO A.R.C. AQUA FARM. Book online and track every step in one place.</p><div class="hero-actions"><button class="secondary" onclick="setPage('packages')">Explore Packages</button><button class="primary" style="background:#dcebdc;color:#214a34" onclick="startBooking()">Book Now →</button></div></div><div class="pond-art"><div class="pond-circle">🦞</div><div class="float-tag tag1">🌱 Pond setup support</div><div class="float-tag tag2">✓ Live booking status updates</div></div></section>
+<section class="hero">
+  <header class="topbar home-navbar">
+    <a href="index.html" class="brand">
+      <img src="pictures/boss-gudo-logo.png" alt="BOSSGUDO A.R.C. AQUA FARM logo" class="brand-logo" />
+      <span class="brand-name">BOSSGUDO<small>A.R.C. AQUA FARM</small></span>
+    </a>
+    <nav class="nav" id="heroNav" aria-label="Main navigation">
+      <a href="index.html" data-page="home" class="active">Home</a>
+      <a href="about.html" data-page="about">About</a>
+      <a href="packages.html" data-page="packages">Packages</a>
+      <a href="booking.html" data-page="booking">Bookings</a>
+      <a href="mybookings.html" data-page="mybookings">My Bookings</a>
+      <a href="login.html" data-page="login">Log In</a>
+    </nav>
+  </header>
+  <div class="hero-content">
+    <div class="eyebrow">Australian Red Claw · Crayfish Services</div>
+    <h1>Good ponds make good beginnings.</h1>
+    <p>Welcome to BossGudo ARC. Find a pond package, plan a custom setup, or arrange a farm visit with a clear, friendly booking process.</p>
+    <div class="hero-actions">
+      <button class="primary" onclick="startBooking()">Book a Service</button>
+      <button class="secondary" onclick="setPage('packages')">Explore Packages</button>
+    </div>
+  </div>
+</section>
 <div class="section-head"><div><h2>Services built around your needs</h2><p>Choose a pond package, design your own pond, or visit the farm.</p></div><button class="secondary" onclick="setPage('about')">About the Farm →</button></div>
 <section class="grid3">
-<div class="card"><img class="service-photo" src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=85" alt="Clear water in a pond installation"><h3>Pond Packages</h3><p>Predefined pond installation packages, each with an included freebie.</p><span class="price-note">${act.length ? "From " + money(Math.min(...act.map((x) => x.price))) + " · demo price" : "Packages coming soon"}</span><br><button class="secondary" onclick="setPage('packages')">View packages</button></div>
+<div class="card"><img class="service-photo" src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=85" alt="Clear water in a pond installation"><h3>Pond Packages</h3><p>Predefined pond installation packages, each with an included freebie.</p><span class="price-note">${act.length ? "From " + money(Math.min(...act.map((x) => x.price))) : "Packages coming soon"}</span><br><button class="secondary" onclick="setPage('packages')">View packages</button></div>
 <div class="card"><img class="service-photo" src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1000&q=85" alt="Water pond landscape" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=85'"><h3>Custom Pond Design</h3><p>Set your own layers, size, and filtration. The price is calculated from your pond size.</p><span class="price-note">Price based on dimensions</span><br><button class="secondary" onclick="choosePkgById('custom')">Design my pond</button></div>
 <div class="card"><img class="service-photo" src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=85" alt="Farm landscape for a visit" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=85'"><h3>Farm Visitation</h3><p>Schedule a farm visit for 1–5 visitors on available weekends.</p><span class="price-note">Weekends only</span><br><button class="secondary" onclick="chooseBookingType('visit')">Book a visitation</button></div>
 </section>
@@ -1073,7 +1126,7 @@ function pkgCardCustom() {
 }
 function packages() {
   const act = activePackages();
-  return `<div class="breadcrumbs">Home / Packages</div><h1 class="page-title">Pond Installation Packages</h1><p class="muted">Browse the owner’s predefined pond packages, each with one included freebie. Choose one option per booking, or design your own pond.</p><div class="pkg-grid" style="margin-top:24px">${act.map(pkgCardPublic).join("")}${pkgCardCustom()}</div><div class="notice" style="margin-top:22px"><strong>How pricing works.</strong> Sample prices and freebies are placeholders for this wireframe. Custom pond price = width × length × ${money(pondRatePerSqmPerLayer)} per m² per layer, plus ${money(filtrationEstimate)} if filtration is selected. You pay 50% when you book; your booking is confirmed once the owner verifies that payment. After the service is done, the owner adds any Lalamove delivery fee and you pay the remaining balance.</div>`;
+  return `<div class="breadcrumbs">Home / Packages</div><h1 class="page-title">Pond Installation Packages</h1><p class="muted">Browse the owner’s predefined pond packages, each with one included freebie. Choose one option per booking, or design your own pond.</p><div class="pkg-grid" style="margin-top:24px">${act.map(pkgCardPublic).join("")}${pkgCardCustom()}</div><div class="notice" style="margin-top:22px"><strong>How pricing works.</strong> Custom pond price = width × length × ${money(pondRatePerSqmPerLayer)} per m² per layer, plus ${money(filtrationEstimate)} if filtration is selected. You pay 50% when you book; your booking is confirmed once the owner verifies that payment. After the service is done, the owner adds any Lalamove delivery fee and you pay the remaining balance.</div>`;
 }
 
 function pkgCardSelect(x, custom) {
@@ -1101,7 +1154,7 @@ function continueToSchedule() {
 }
 function dateStep() {
   const p = currentPricing();
-  return `<h2>Choose your service date</h2><p class="muted">Pick your preferred date first, then enter your details. Service dates are open on weekends only. Calendar availability is sample data in this prototype.</p><div class="calendar-wrap" style="margin-top:14px">${calendarBlock("service")}<div><div class="card"><h3 style="margin-top:0">Selected date</h3><p>${selectedDate ? fmtDate(selectedDate, true) : "Choose an available green date"}</p><div class="notice">Choose any open weekend date. Closed dates cannot be selected. Your date is reserved once your 50% down payment is verified.</div></div><div class="card" style="margin-top:12px"><h3 style="margin-top:0">Your option</h3><p style="margin:0"><strong>${safe(selectedPackage)}</strong><br><span class="muted">${money(p.total)} · 50% down payment ${money(p.deposit)}</span></p></div></div></div><div class="wizard-actions"><button class="secondary" onclick="wizardStep=1;render()">← Back</button><button class="primary" onclick="goDetails()">Continue to Details →</button></div>`;
+  return `<h2>Choose your service date</h2><p class="muted">Pick your preferred date first, then enter your details. Service dates are open on weekends only. Calendar availability is managed by the farm.</p><div class="calendar-wrap" style="margin-top:14px">${calendarBlock("service")}<div><div class="card"><h3 style="margin-top:0">Selected date</h3><p>${selectedDate ? fmtDate(selectedDate, true) : "Choose an available green date"}</p><div class="notice">Choose any open weekend date. Closed dates cannot be selected. Your date is reserved once your 50% down payment is verified.</div></div><div class="card" style="margin-top:12px"><h3 style="margin-top:0">Your option</h3><p style="margin:0"><strong>${safe(selectedPackage)}</strong><br><span class="muted">${money(p.total)} · 50% down payment ${money(p.deposit)}</span></p></div></div></div><div class="wizard-actions"><button class="secondary" onclick="wizardStep=1;render()">← Back</button><button class="primary" onclick="goDetails()">Continue to Details →</button></div>`;
 }
 function goDetails() {
   if (!selectedDate || blockedDates.service.has(selectedDate)) {
@@ -1274,7 +1327,7 @@ function customerBookingCard(b) {
 function mybookings() {
   const mine = myBookingList(),
     myVisits = visits.filter(
-      (v) => v.name === userName || userName === "Demo Customer",
+      (v) => v.name === userName || userName === "Customer Account",
     ),
     fresh = [];
   mine.forEach((b) =>
@@ -1282,7 +1335,7 @@ function mybookings() {
       .filter((e) => !e.seen)
       .forEach((e) => fresh.push({ b, e })),
   );
-  return `<div class="breadcrumbs">Customer Portal / My Bookings</div><div class="admin-header"><div><h1 class="page-title">My Bookings</h1><p class="muted">Follow each booking from submission to final payment. Booking status and payment status are tracked separately.</p></div><button class="primary" onclick="startBooking()">+ New Booking</button></div><div class="panel"><div class="pill-row"><span class="pill">Signed in as ${safe(userName)}</span><span class="pill">Demo account</span></div></div>${fresh.length ? `<div class="callout" style="margin-top:16px"><strong>🔔 ${fresh.length} new update${fresh.length > 1 ? "s" : ""}</strong><ul class="timeline" style="margin-top:12px">${fresh.map((x) => `<li><strong>${safe(x.b.pkg)} (${x.b.ref}):</strong> ${safe(x.e.text)}<span class="when">${safe(x.e.at)}</span></li>`).join("")}</ul></div>` : ""}<h2 style="margin-top:28px">Service bookings</h2>${mine.map(customerBookingCard).join("") || '<div class="empty">No service bookings yet.</div>'}<h2 style="margin-top:28px">Farm visitations</h2>${myVisits.map((v) => `<div class="card" style="margin:12px 0"><div class="admin-header"><div><div class="muted" style="font-size:12px">${v.ref} · ${v.type === "Special" ? "Special date request" : "Regular schedule"}</div><h3 style="margin:7px 0">${fmtDate(v.date, true)}</h3></div><span class="status ${visitStatusClass(v.status)}">${safe(v.status)}</span></div><div class="summary-line"><span>Visitors</span><strong>${v.visitors}</strong></div><div class="summary-line"><span>Farm name</span><strong>${safe(v.farm || "Not provided")}</strong></div><div class="summary-line"><span>Contact</span><strong>${safe(v.phone)} · ${safe(v.email)}</strong></div>${v.reason ? `<div class="summary-line"><span>Reason for special date</span><strong>${safe(v.reason)}</strong></div>` : ""}</div>`).join("") || '<div class="empty">No visitations yet.</div>'}<div class="notice" style="margin-top:16px">GCash transfers happen outside this website. The owner manually verifies each transaction before any amount is recorded as received.</div>`;
+  return `<div class="breadcrumbs">Customer Portal / My Bookings</div><div class="admin-header"><div><h1 class="page-title">My Bookings</h1><p class="muted">Follow each booking from submission to final payment. Booking status and payment status are tracked separately.</p></div><button class="primary" onclick="startBooking()">+ New Booking</button></div><div class="panel"><div class="pill-row"><span class="pill">Signed in as ${safe(userName)}</span></div></div>${fresh.length ? `<div class="callout" style="margin-top:16px"><strong>🔔 ${fresh.length} new update${fresh.length > 1 ? "s" : ""}</strong><ul class="timeline" style="margin-top:12px">${fresh.map((x) => `<li><strong>${safe(x.b.pkg)} (${x.b.ref}):</strong> ${safe(x.e.text)}<span class="when">${safe(x.e.at)}</span></li>`).join("")}</ul></div>` : ""}<h2 style="margin-top:28px">Service bookings</h2>${mine.map(customerBookingCard).join("") || '<div class="empty">No service bookings yet.</div>'}<h2 style="margin-top:28px">Farm visitations</h2>${myVisits.map((v) => `<div class="card" style="margin:12px 0"><div class="admin-header"><div><div class="muted" style="font-size:12px">${v.ref} · ${v.type === "Special" ? "Special date request" : "Regular schedule"}</div><h3 style="margin:7px 0">${fmtDate(v.date, true)}</h3></div><span class="status ${visitStatusClass(v.status)}">${safe(v.status)}</span></div><div class="summary-line"><span>Visitors</span><strong>${v.visitors}</strong></div><div class="summary-line"><span>Farm name</span><strong>${safe(v.farm || "Not provided")}</strong></div><div class="summary-line"><span>Contact</span><strong>${safe(v.phone)} · ${safe(v.email)}</strong></div>${v.reason ? `<div class="summary-line"><span>Reason for special date</span><strong>${safe(v.reason)}</strong></div>` : ""}</div>`).join("") || '<div class="empty">No visitations yet.</div>'}<div class="notice" style="margin-top:16px">GCash transfers happen outside this website. The owner manually verifies each transaction before any amount is recorded as received.</div>`;
 }
 
 function viewBooking(ref, admin) {
@@ -1329,7 +1382,7 @@ function customerPaymentPage() {
   if (!b)
     return `<div class="panel"><h2>Payment details unavailable</h2><button class="primary" onclick="setPage('mybookings')">Return to My Bookings</button></div>`;
   const amount = target === "balance" ? b.balance : b.deposit;
-  return `<div class="breadcrumbs">Customer Portal / My Bookings / GCash Payment</div><div class="panel" style="max-width:900px;margin:0 auto"><div class="admin-header"><div><h1 class="page-title">${target === "balance" ? "Pay Outstanding Balance" : "Pay 50% Down Payment"}</h1><p class="muted">Booking ${safe(b.ref)} · ${safe(b.pkg)}</p></div><span class="status green">${target === "balance" ? "Balance payment" : "Down payment"}</span></div><div class="pay-grid"><div class="card" style="text-align:center"><h3>Scan to pay with GCash</h3>${qrPlaceholder()}<p class="muted" style="font-size:12px">Wireframe placeholder only. Replace with the owner’s official, scannable GCash QR code.</p></div><div class="card"><h3>Owner’s GCash details</h3><div class="summary-line"><span>Account name</span><strong>[Owner’s GCash account name]</strong></div><div class="summary-line"><span>GCash number</span><strong>[Owner’s GCash number]</strong></div>${target === "balance" ? `<div class="summary-line"><span>Package / customization</span><strong>${money(Number(b.servicePrice) + Number(b.customizationFee || 0))}</strong></div><div class="summary-line"><span>Delivery fee</span><strong>${money(b.deliveryFee || 0)}</strong></div><div class="summary-line"><span>Already paid (verified)</span><strong>${money(b.paidAmount)}</strong></div>` : `<div class="summary-line"><span>Total service price</span><strong>${money(b.total)}</strong></div>`}<div class="summary-line"><span>Amount to pay now</span><strong style="font-size:23px;color:var(--green)">${money(amount)}</strong></div><div class="notice" style="margin-top:15px">Open GCash, scan the QR or use the details above, and pay the exact amount. After the transfer succeeds, upload your receipt below.</div></div></div><div class="panel" style="margin-top:20px"><h3 style="margin-top:0">Upload payment receipt</h3><p class="muted">The owner compares the reference, receipt and amount with the actual GCash transaction. You will see a status update here once it is verified.</p><div class="field"><label for="gcashReference">GCash transaction reference number *</label><input id="gcashReference" placeholder="Enter the transaction reference number" required></div><div class="field"><label for="gcashProof">Payment receipt / screenshot *</label><input id="gcashProof" type="file" accept="image/*,.pdf" required><p class="muted" style="font-size:12px;margin-top:6px">Accepted: image or PDF, up to 8 MB.</p></div><div class="wizard-actions"><button class="secondary" onclick="setPage('mybookings')">Cancel</button><button class="primary" onclick="submitPaymentProof('${b.ref}','${target}')">I’ve Paid — Submit Receipt</button></div></div></div>`;
+  return `<div class="breadcrumbs">Customer Portal / My Bookings / GCash Payment</div><div class="panel" style="max-width:900px;margin:0 auto"><div class="admin-header"><div><h1 class="page-title">${target === "balance" ? "Pay Outstanding Balance" : "Pay 50% Down Payment"}</h1><p class="muted">Booking ${safe(b.ref)} · ${safe(b.pkg)}</p></div><span class="status green">${target === "balance" ? "Balance payment" : "Down payment"}</span></div><div class="pay-grid"><div class="card" style="text-align:center"><h3>Scan to pay with GCash</h3>${qrPlaceholder()}<p class="muted" style="font-size:12px">Scan the QR code or use the owner’s GCash account details.</p></div><div class="card"><h3>Owner’s GCash details</h3><div class="summary-line"><span>Account name</span><strong>[Owner’s GCash account name]</strong></div><div class="summary-line"><span>GCash number</span><strong>[Owner’s GCash number]</strong></div>${target === "balance" ? `<div class="summary-line"><span>Package / customization</span><strong>${money(Number(b.servicePrice) + Number(b.customizationFee || 0))}</strong></div><div class="summary-line"><span>Delivery fee</span><strong>${money(b.deliveryFee || 0)}</strong></div><div class="summary-line"><span>Already paid (verified)</span><strong>${money(b.paidAmount)}</strong></div>` : `<div class="summary-line"><span>Total service price</span><strong>${money(b.total)}</strong></div>`}<div class="summary-line"><span>Amount to pay now</span><strong style="font-size:23px;color:var(--green)">${money(amount)}</strong></div><div class="notice" style="margin-top:15px">Open GCash, scan the QR or use the details above, and pay the exact amount. After the transfer succeeds, upload your receipt below.</div></div></div><div class="panel" style="margin-top:20px"><h3 style="margin-top:0">Upload payment receipt</h3><p class="muted">The owner compares the reference, receipt and amount with the actual GCash transaction. You will see a status update here once it is verified.</p><div class="field"><label for="gcashReference">GCash transaction reference number *</label><input id="gcashReference" placeholder="Enter the transaction reference number" required></div><div class="field"><label for="gcashProof">Payment receipt / screenshot *</label><input id="gcashProof" type="file" accept="image/*,.pdf" required><p class="muted" style="font-size:12px;margin-top:6px">Accepted: image or PDF, up to 8 MB.</p></div><div class="wizard-actions"><button class="secondary" onclick="setPage('mybookings')">Cancel</button><button class="primary" onclick="submitPaymentProof('${b.ref}','${target}')">I’ve Paid — Submit Receipt</button></div></div></div>`;
 }
 async function submitPaymentProof(ref, target) {
   const b = bookings.find((x) => x.ref === ref);
@@ -1429,7 +1482,7 @@ function admin() {
     faqs: adminFaqs,
   };
   const cur = tabs.find((t) => t[0] === adminTab) || ["", "Dashboard"];
-  return `<div class="breadcrumbs">Admin Portal / ${cur[1]}</div><div class="admin-header"><div><h1 class="page-title">Admin Dashboard</h1><p class="muted">Manage bookings, payments, visits, the calendar, packages, customers and assistant answers.</p></div><span class="status green">Owner demo view</span></div><div class="layout" style="margin-top:20px"><aside class="sidebar">${tabs.map((t) => (t[0] === "g" ? `<div class="group">${t[1]}</div>` : `<button class="${adminTab === t[0] ? "active" : ""}" onclick="adminTab='${t[0]}';render()">${t[1]}${t[2] ? `<span class="count">${t[2]}</span>` : ""}</button>`)).join("")}</aside><section style="min-width:0">${views[adminTab]()}</section></div>`;
+  return `<div class="breadcrumbs">Admin Portal / ${cur[1]}</div><div class="admin-header"><div><h1 class="page-title">Admin Dashboard</h1><p class="muted">Manage bookings, payments, visits, the calendar, packages, customers and assistant answers.</p></div></div><div class="layout" style="margin-top:20px"><aside class="sidebar">${tabs.map((t) => (t[0] === "g" ? `<div class="group">${t[1]}</div>` : `<button class="${adminTab === t[0] ? "active" : ""}" onclick="adminTab='${t[0]}';render()">${t[1]}${t[2] ? `<span class="count">${t[2]}</span>` : ""}</button>`)).join("")}</aside><section style="min-width:0">${views[adminTab]()}</section></div>`;
 }
 
 function adminOverview() {
@@ -2159,7 +2212,7 @@ function adminCatalog() {
             .toLowerCase()
             .includes(q),
       );
-  return `<div class="panel"><div class="admin-header"><div><h3 style="margin:0">Package Catalog</h3><p class="muted" style="margin:6px 0 0">Add, edit, hide, reorder and delete pond packages. Visible packages appear on the Packages page and in the booking selector.</p></div><button class="primary" onclick="openPackageForm(-1)">＋ Add package</button></div><div class="stat-grid" style="margin-top:16px"><div class="stat"><div class="label">Visible packages</div><div class="value">${act.length}</div></div><div class="stat"><div class="label">Hidden</div><div class="value">${pondPackageCatalog.length - act.length}</div></div><div class="stat"><div class="label">Average visible price</div><div class="value" style="font-size:22px">${money(avg)}</div></div></div></div><div class="panel"><h3 style="margin-top:0">Custom pond pricing</h3><p class="muted" style="margin-top:0">Used by Custom Pond Design: width × length × rate per m² per layer, plus the filtration fee when selected.</p><div class="field-grid">${fld("set_rate", "Rate per m² per layer (₱)", pondRatePerSqmPerLayer, "number", 'min="0" step="1"')}${fld("set_filt", "Filtration fee (₱)", filtrationEstimate, "number", 'min="0" step="1"')}</div><button class="primary" onclick="savePricingSettings()">Save pricing settings</button></div><div class="panel"><div class="toolbar" style="margin-top:0"><h3 style="margin:0">Packages (${pondPackageCatalog.length})</h3><input type="search" placeholder="Search packages…" value="${safe(pkgSearch)}" oninput="pkgSearch=this.value;refreshCatalogGrid()" aria-label="Search packages"></div><div id="pkgHost" class="pkg-grid">${items.map(([x, i]) => pkgCardAdmin(x, i)).join("") || '<div class="empty">No packages yet. Add your first package.</div>'}</div></div><div class="notice">Changes live in this prototype session only. A production version needs a database to keep them across devices. Deleting a package does not change existing bookings.</div>`;
+  return `<div class="panel"><div class="admin-header"><div><h3 style="margin:0">Package Catalog</h3><p class="muted" style="margin:6px 0 0">Add, edit, hide, reorder and delete pond packages. Visible packages appear on the Packages page and in the booking selector.</p></div><button class="primary" onclick="openPackageForm(-1)">＋ Add package</button></div><div class="stat-grid" style="margin-top:16px"><div class="stat"><div class="label">Visible packages</div><div class="value">${act.length}</div></div><div class="stat"><div class="label">Hidden</div><div class="value">${pondPackageCatalog.length - act.length}</div></div><div class="stat"><div class="label">Average visible price</div><div class="value" style="font-size:22px">${money(avg)}</div></div></div></div><div class="panel"><h3 style="margin-top:0">Custom pond pricing</h3><p class="muted" style="margin-top:0">Used by Custom Pond Design: width × length × rate per m² per layer, plus the filtration fee when selected.</p><div class="field-grid">${fld("set_rate", "Rate per m² per layer (₱)", pondRatePerSqmPerLayer, "number", 'min="0" step="1"')}${fld("set_filt", "Filtration fee (₱)", filtrationEstimate, "number", 'min="0" step="1"')}</div><button class="primary" onclick="savePricingSettings()">Save pricing settings</button></div><div class="panel"><div class="toolbar" style="margin-top:0"><h3 style="margin:0">Packages (${pondPackageCatalog.length})</h3><input type="search" placeholder="Search packages…" value="${safe(pkgSearch)}" oninput="pkgSearch=this.value;refreshCatalogGrid()" aria-label="Search packages"></div><div id="pkgHost" class="pkg-grid">${items.map(([x, i]) => pkgCardAdmin(x, i)).join("") || '<div class="empty">No packages yet. Add your first package.</div>'}</div></div>`;
 }
 function refreshCatalogGrid() {
   const h = document.getElementById("pkgHost");
@@ -2446,6 +2499,7 @@ function adminSales() {
 
 /* ----- render ----- */
 function render() {
+  ensureNavigationShell();
   const views = {
     home,
     about,
@@ -2460,7 +2514,7 @@ function render() {
   };
   app.innerHTML = (views[page] || home)();
   document
-    .querySelectorAll("#mainNav a")
+    .querySelectorAll(".nav a[data-page]")
     .forEach((link) =>
       link.classList.toggle("active", link.dataset.page === page),
     );
@@ -2468,7 +2522,7 @@ function render() {
     document.getElementById("loginForm").onsubmit = (e) => {
       e.preventDefault();
       loggedIn = true;
-      userName = userName || "Demo Customer";
+      userName = userName || "Customer Account";
       setPage("mybookings");
     };
   }
@@ -2478,7 +2532,7 @@ function render() {
       userName = document.getElementById("regName").value.trim();
       upsertCustomer({ name: userName });
       loggedIn = true;
-      alert("Demo account created for this session.");
+      alert("Account created for this session.");
       setPage("mybookings");
     };
   }
@@ -2489,33 +2543,48 @@ function render() {
   updateNavBadge();
 }
 
-document.querySelectorAll(".footer-year").forEach((year) => {
+document.querySelectorAll("#footerYear, .footer-year").forEach((year) => {
   year.textContent = new Date().getFullYear();
 });
 
-document.getElementById("chatLaunch").onclick = () => {
-  document.getElementById("chatBox").style.display = "block";
-};
-document.getElementById("chatClose").onclick = () => {
-  document.getElementById("chatBox").style.display = "none";
-};
-document.getElementById("chatForm").onsubmit = (e) => {
-  e.preventDefault();
-  let input = document.getElementById("chatText"),
-    q = input.value.trim();
-  if (!q) return;
-  let body = document.getElementById("chatBody");
-  body.innerHTML += `<div class="bubble user">${safe(q)}</div><div class="bubble">${safe(botAnswer(q))}</div>`;
-  input.value = "";
-  body.scrollTop = body.scrollHeight;
-};
-document.querySelectorAll("#mainNav a").forEach((link) =>
-  link.addEventListener("click", (e) => {
+const chatLaunch = document.getElementById("chatLaunch");
+const chatBox = document.getElementById("chatBox");
+const chatClose = document.getElementById("chatClose");
+const chatForm = document.getElementById("chatForm");
+
+if (chatLaunch && chatBox) {
+  chatLaunch.onclick = () => {
+    chatBox.style.display = "block";
+    chatLaunch.setAttribute("aria-expanded", "true");
+  };
+}
+if (chatClose && chatBox) {
+  chatClose.onclick = () => {
+    chatBox.style.display = "none";
+    chatLaunch?.setAttribute("aria-expanded", "false");
+  };
+}
+if (chatForm) {
+  chatForm.onsubmit = (e) => {
     e.preventDefault();
-    if (link.dataset.page === "booking") bookingType = null;
-    setPage(link.dataset.page);
-  }),
-);
+    const input = document.getElementById("chatText"),
+      body = document.getElementById("chatBody"),
+      q = input?.value.trim();
+    if (!input || !body || !q) return;
+    body.innerHTML += `<div class="bubble user">${safe(q)}</div><div class="bubble">${safe(botAnswer(q))}</div>`;
+    input.value = "";
+    body.scrollTop = body.scrollHeight;
+  };
+}
+
+// Delegation keeps navigation working when the homepage renders its navbar inside the hero.
+document.addEventListener("click", (e) => {
+  const link = e.target.closest(".nav a[data-page]");
+  if (!link) return;
+  e.preventDefault();
+  if (link.dataset.page === "booking") bookingType = null;
+  setPage(link.dataset.page);
+});
 window.addEventListener("popstate", () => {
   const currentFile = location.pathname.split("/").pop() || "index.html",
     route = Object.keys(pageFiles).find(
@@ -2523,6 +2592,7 @@ window.addEventListener("popstate", () => {
     );
   if (route) {
     page = route;
+    syncPageChrome(route);
     render();
   }
 });

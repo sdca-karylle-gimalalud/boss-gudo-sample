@@ -118,18 +118,6 @@ main {
   margin: 0 auto;
   padding: 34px 24px 70px;
 }
-.hero {
-  background: linear-gradient(115deg, #173f2e, #347453);
-  color: #fff;
-  border-radius: 24px;
-  padding: 55px 48px;
-  display: grid;
-  grid-template-columns: 1.25fr 0.75fr;
-  gap: 28px;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-}
 .eyebrow {
   font-size: 12px;
   text-transform: uppercase;
@@ -137,66 +125,11 @@ main {
   font-weight: 800;
   color: #c9e1cf;
 }
-.hero h1 {
-  font-size: clamp(30px, 4vw, 48px);
-  line-height: 1.08;
-  margin: 13px 0 17px;
-  max-width: 600px;
-}
-.hero p {
-  line-height: 1.7;
-  color: #e3eee5;
-  max-width: 560px;
-}
 .hero-actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 25px;
-}
-.hero .secondary {
-  background: #ffffff;
-  color: var(--green);
-}
-.pond-art {
-  min-height: 220px;
-  display: grid;
-  place-items: center;
-  position: relative;
-}
-.pond-circle {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 30%,
-    #a4c6a7,
-    #5b916b 45%,
-    #174b37 75%
-  );
-  border: 12px solid #e2ebdc;
-  box-shadow: 0 18px 40px #09271966;
-  display: grid;
-  place-items: center;
-  font-size: 90px;
-}
-.float-tag {
-  position: absolute;
-  background: #fff;
-  color: var(--green);
-  padding: 11px 14px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px #09271930;
-  font-weight: 750;
-  font-size: 12px;
-}
-.tag1 {
-  top: 20px;
-  right: 0;
-}
-.tag2 {
-  bottom: 16px;
-  left: 0;
 }
 .section-head {
   display: flex;
@@ -753,18 +686,6 @@ td .actions {
   .nav a {
     padding: 8px;
   }
-  .hero {
-    grid-template-columns: 1fr;
-    padding: 32px 24px;
-  }
-  .pond-art {
-    min-height: 160px;
-  }
-  .pond-circle {
-    width: 150px;
-    height: 150px;
-    font-size: 62px;
-  }
   .grid3,
   .steps,
   .package-grid {
@@ -863,10 +784,6 @@ main,
   .calendar-wrap {
     grid-template-columns: minmax(0, 1fr) 220px;
   }
-  .hero {
-    padding: 40px 32px;
-    gap: 18px;
-  }
   .catalog-photo {
     max-width: 100%;
   }
@@ -891,13 +808,6 @@ main,
     padding: 9px 6px;
     font-size: 12px;
     white-space: normal;
-  }
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-    padding: 30px 22px;
-  }
-  .pond-art {
-    min-height: 150px;
   }
   .grid3,
   .package-grid,
@@ -965,23 +875,6 @@ main,
   .page-title {
     font-size: 26px;
     line-height: 1.2;
-  }
-  .hero {
-    border-radius: 17px;
-    padding: 25px 17px;
-  }
-  .hero h1 {
-    font-size: clamp(27px, 8vw, 34px);
-  }
-  .pond-circle {
-    width: 125px;
-    height: 125px;
-    font-size: 52px;
-    border-width: 8px;
-  }
-  .float-tag {
-    font-size: 10px;
-    padding: 8px 9px;
   }
   .grid3,
   .package-grid,
@@ -1684,91 +1577,6 @@ select:focus-visible {
   letter-spacing: 0.12em;
 }
 
-/* One wide, photo-based hero. The existing script.js supplies its text/buttons. */
-body[data-page="home"] #app > .hero {
-  width: calc(100vw - 6px);
-  max-width: none;
-  min-height: min(680px, calc(100vh - 72px));
-  margin: 0 0 36px;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  padding: clamp(42px, 7vw, 92px) clamp(24px, 9vw, 140px);
-  border-radius: 0;
-  background:
-    radial-gradient(circle at 82% 20%, rgba(123, 174, 133, 0.32), transparent 30%),
-    linear-gradient(115deg, #123b2b 0%, #245d40 52%, #347453 100%);
-  box-shadow: none;
-  overflow: hidden;
-}
-
-body[data-page="home"] #app > .hero > :first-child {
-  width: min(620px, 100%);
-  max-width: 620px;
-  position: relative;
-  z-index: 1;
-}
-
-/* Remove the decorative circle, emoji crayfish and floating labels. */
-body[data-page="home"] #app > .hero .pond-art,
-body[data-page="home"] #app > .hero .pond-circle,
-body[data-page="home"] #app > .hero .float-tag {
-  display: none !important;
-}
-
-body[data-page="home"] #app > .hero .eyebrow {
-  color: #e6c8a9;
-  letter-spacing: 0.14em;
-}
-
-body[data-page="home"] #app > .hero h1 {
-  max-width: 650px;
-  margin: 14px 0 18px;
-  color: #fff;
-  font-size: clamp(38px, 5vw, 62px);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
-}
-
-body[data-page="home"] #app > .hero p {
-  max-width: 550px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 15px;
-  line-height: 1.8;
-}
-
-body[data-page="home"] #app > .hero .hero-actions {
-  margin-top: 26px;
-  gap: 12px;
-}
-
-body[data-page="home"] #app > .hero .primary,
-body[data-page="home"] #app > .hero .secondary {
-  min-height: 46px;
-  padding: 12px 21px;
-  border-radius: 8px;
-  font-weight: 700;
-}
-
-body[data-page="home"] #app > .hero .primary {
-  background: #fff;
-  color: #244b34;
-}
-
-body[data-page="home"] #app > .hero .secondary {
-  background: #dce9da;
-  border-color: #dce9da;
-  color: #244b34;
-}
-
-body[data-page="home"] #app > .hero .primary:hover,
-body[data-page="home"] #app > .hero .secondary:hover {
-  background: #f0f5ed;
-  color: #173f2e;
-}
-
 /* Keep the rest of the homepage content neatly aligned below the hero. */
 body[data-page="home"] #app > .section-head,
 body[data-page="home"] #app > .grid3,
@@ -1948,11 +1756,9 @@ button:disabled {
 @media (max-width: 800px) {
   body[data-page="home"] #app > .hero {
     width: 100%;
-    min-height: 540px;
-    padding: 54px 7%;
-    background-position: 60% center;
-    left: auto;
-    transform: none;
+    min-height: 520px;
+    padding: 48px 7% 38px;
+    background-position: 62% center;
   }
   body[data-page="home"] #app > .hero h1 {
     font-size: clamp(36px, 7vw, 48px);
@@ -1970,8 +1776,9 @@ button:disabled {
   }
   body[data-page="home"] #app > .hero {
     min-height: 500px;
-    padding: 42px 6%;
-    background-position: 62% center;
+    padding: 38px 6% 28px;
+    border-radius: 22px;
+    background-position: 66% center;
   }
   body[data-page="home"] #app > .hero h1 {
     font-size: clamp(34px, 9vw, 42px);
@@ -1982,8 +1789,147 @@ button:disabled {
   body[data-page="home"] #app > .hero .hero-actions {
     align-items: flex-start;
   }
+  body[data-page="home"] #app > .hero .hero-trust {
+    gap: 10px 15px;
+    margin-top: 28px;
+  }
   .footer {
     gap: 22px;
     padding: 28px 20px 20px;
+  }
+}
+
+/* Full-height home hero with the navigation layered over the image. */
+.inner-navbar {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 2px 12px rgba(24, 59, 40, 0.04);
+}
+
+.home-navbar {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+}
+
+.topbar[hidden] {
+  display: none !important;
+}
+
+body[data-page="home"] main {
+  max-width: none;
+  padding: 0;
+}
+
+body[data-page="home"] #app > .hero {
+  width: 100%;
+  max-width: none;
+  min-height: 100svh;
+  margin: 0;
+  padding: 0 clamp(16px, 5vw, 72px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, rgba(8, 31, 21, 0.86) 0%, rgba(12, 55, 35, 0.68) 52%, rgba(17, 58, 37, 0.26) 100%),
+    url("./pictures/home-hero-bg.jpg") center / cover no-repeat;
+  box-shadow: none;
+}
+
+body[data-page="home"] #app > .hero .home-navbar {
+  width: 100%;
+  height: auto;
+  min-height: 76px;
+  padding: 14px 0;
+  position: relative;
+  top: auto;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+  z-index: 2;
+}
+
+body[data-page="home"] #app > .hero .brand-name,
+body[data-page="home"] #app > .hero .nav a {
+  color: #fff;
+}
+
+body[data-page="home"] #app > .hero .brand-name small {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+body[data-page="home"] #app > .hero h1,
+body[data-page="home"] #app > .hero p,
+body[data-page="home"] #app > .hero .hero-trust {
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+body[data-page="home"] #app > .hero h1 {
+  max-width: 660px;
+  margin: 15px 0 20px;
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+}
+
+body[data-page="home"] #app > .hero p {
+  max-width: 570px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+body[data-page="home"] #app > .hero .hero-trust {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body[data-page="home"] #app > .hero .hero-trust strong {
+  color: #fff;
+}
+
+body[data-page="home"] #app > .hero .nav a:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+body[data-page="home"] #app > .hero .nav a.active {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+body[data-page="home"] #app > .hero .hero-content {
+  width: min(1160px, 100%);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 72px 0 92px;
+}
+
+@media (max-width: 800px) {
+  body[data-page="home"] #app > .hero {
+    padding: 0 16px;
+    background-position: 62% center;
+  }
+
+  body[data-page="home"] #app > .hero .home-navbar {
+    min-height: 0;
+    padding: 12px 0;
+  }
+
+  body[data-page="home"] #app > .hero .hero-content {
+    padding: 54px 0 64px;
+  }
+}
+
+@media (max-width: 540px) {
+  body[data-page="home"] #app > .hero {
+    background-position: 68% center;
+  }
+
+  body[data-page="home"] #app > .hero .hero-content {
+    padding: 42px 0 52px;
   }
 }
