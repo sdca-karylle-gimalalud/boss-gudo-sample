@@ -2480,9 +2480,12 @@ function render() {
   if (page !== "home") app.innerHTML = (views[page] || about)();
   document
     .querySelectorAll(".nav a[data-page]")
-    .forEach((link) =>
-      link.classList.toggle("active", link.dataset.page === page),
-    );
+    .forEach((link) => {
+      link.classList.toggle("active", link.dataset.page === page);
+      // Show My Bookings only after the user has logged in.
+      if (link.dataset.page === "mybookings")
+        link.style.display = loggedIn ? "inline-block" : "none";
+    });
   if (page === "login") {
     document.getElementById("loginForm").onsubmit = (e) => {
       e.preventDefault();
